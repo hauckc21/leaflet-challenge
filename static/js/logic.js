@@ -6,6 +6,8 @@ function marketSize(magnitude) {
     return magnitude * 4;
 };
 
+var earthquakes = new L.LayerGroup();
+
 //api call to get geoson data
 d3.json(api_quakes, function(geoJson) {
     L.geoJSON(geoJson.features, {
@@ -19,7 +21,13 @@ d3.json(api_quakes, function(geoJson) {
                 fillOpacity: 0.7,
                 weight: 0.1,
                 color: "black"
-
             }
         },
-
+        onEachFeature: function(feature, layer) {
+            layer.bindPopup(
+                "<h4 style='text-align:center;'>" + new Date(feature.properties.time) +
+                "</h4> <hr> <h5 style='text-align:center;'>" + feature.properties.title + "</h5>");
+        }
+    }).addTo(earthquakes);
+    createImageBitmap(earthquakes);
+});
