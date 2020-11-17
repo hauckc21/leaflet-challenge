@@ -31,3 +31,14 @@ d3.json(api_quakes, function(geoJson) {
     }).addTo(earthquakes);
     createImageBitmap(earthquakes);
 });
+
+// correlate marker color to earthquake magnitude
+function Color(magnitude) {
+    if (magnitude > 5) {
+        return 'red'
+    } else if (magnitude > 4) {
+        return 'darkorange'
+    } else if (magnitude > 3) {
+        return 'tan'
+        
+};
