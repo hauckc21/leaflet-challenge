@@ -1,44 +1,27 @@
-//define urls
+console.log("this is logic.js");
+
+const API_KEY = "pk.eyJ1IjoiaGF1Y2tjIiwiYSI6ImNrZnkzMDIyazF6ZWYycm10MTYxNGdxOWQifQ.HOOSVyjfl9NHhChgPB1YWgeyJ1IjoiY29sbGVlbjU0NyIsImEiOiJja2Z5YzFrc2ExbDBpMzFxcWc4NHpsZ2ZtIn0.etuB1olIeSofH9wCvn6aPA";
+
+// Get data url
+// url = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson"
 var api_quakes = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/significant_month.geojson"
 
-//define markers for map
-function marketSize(magnitude) {
-    return magnitude * 4;
-};
+var gray = L.tileLayer("https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}", {
+    attribution: "© <a href='https://www.mapbox.com/about/maps/'>Mapbox</a> © <a href='http://www.openstreetmap.org/copyright'>OpenStreetMap</a> <strong><a href='https://www.mapbox.com/map-feedback/' target='_blank'>Improve this map</a></strong>",
+    tileSize: 512,
+    maxZoom: 18,
+    zoomOffset: -1,
+    id: "mapbox/light-v10",
+    accessToken: API_KEY
+  });
+ 
 
-var earthquakes = new L.LayerGroup();
+  var satellite = L.tileLayer("https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}", {
+    attribution: "© <a href='https://www.mapbox.com/about/maps/'>Mapbox</a> © <a href='http://www.openstreetmap.org/copyright'>OpenStreetMap</a> <strong><a href='https://www.mapbox.com/map-feedback/' target='_blank'>Improve this map</a></strong>",
+    tileSize: 512,
+    maxZoom: 18,
+    zoomOffset: -1,
+    id: "mapbox/satellite-v9",
+    accessToken: API_KEY
+  });
 
-//api call to get geoson data
-d3.json(api_quakes, function(geoJson) {
-    L.geoJSON(geoJson.features, {
-        pointToLayer: function(geoJsonPoint, latlng) {
-            return L.circleMarket(latlng, {radius: markerSize(geoJsonPoint.properties.mag) });
-        },
-
-        style: function(geoJsonFeature) {
-            return {
-                fillColor: Color(geoJsonFeature.properties.mag),
-                fillOpacity: 0.7,
-                weight: 0.1,
-                color: "black"
-            }
-        },
-        onEachFeature: function(feature, layer) {
-            layer.bindPopup(
-                "<h4 style='text-align:center;'>" + new Date(feature.properties.time) +
-                "</h4> <hr> <h5 style='text-align:center;'>" + feature.properties.title + "</h5>");
-        }
-    }).addTo(earthquakes);
-    createImageBitmap(earthquakes);
-});
-
-// correlate marker color to earthquake magnitude
-function Color(magnitude) {
-    if (magnitude > 5) {
-        return 'red'
-    } else if (magnitude > 4) {
-        return 'darkorange'
-    } else if (magnitude > 3) {
-        return 'tan'
-        
-};
