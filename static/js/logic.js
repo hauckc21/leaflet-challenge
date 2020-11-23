@@ -48,3 +48,18 @@ var myMap = L.map("mapid",{
     layers: [grayMap, satellite, outdoors]
 });
 grayMap.addTo(myMap);
+
+// Create Earthquake & Tectonic variables
+var earthquakes=new L.LayerGroup();
+
+// Variable Overlays
+var overlays={
+    "Earthquakes":earthquakes
+};
+// Add a Control to the Map
+L.control.layers(base_map,overlays).addTo(myMap);
+
+d3.json(url,function(earthquakeData)
+{
+    console.log(earthquakeData.features)
+
