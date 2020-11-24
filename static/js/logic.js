@@ -4,6 +4,26 @@ const API_KEY = "pk.eyJ1IjoiaGF1Y2tjIiwiYSI6ImNraHV6dGVmazA2dGQzMW1vZGh5d3NybTAi
 url = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/4.5_month.geojson"
 
 // Create Layers for the map
+var outdoors = L.tileLayer("https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}", {
+    attribution: "© <a href='https://www.mapbox.com/about/maps/'>Mapbox</a> © <a href='http://www.openstreetmap.org/copyright'>OpenStreetMap</a> <strong><a href='https://www.mapbox.com/map-feedback/' target='_blank'>Improve this map</a></strong>",
+    tileSize: 512,
+    maxZoom: 18,
+    zoomOffset: -1,
+    id: "mapbox/outdoors-v11",
+    accessToken: API_KEY
+  });
+
+
+var satellite = L.tileLayer("https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}", {
+    attribution: "© <a href='https://www.mapbox.com/about/maps/'>Mapbox</a> © <a href='http://www.openstreetmap.org/copyright'>OpenStreetMap</a> <strong><a href='https://www.mapbox.com/map-feedback/' target='_blank'>Improve this map</a></strong>",
+    tileSize: 512,
+    maxZoom: 18,
+    zoomOffset: -1,
+    id: "mapbox/satellite-v9",
+    accessToken: API_KEY
+  });
+
+
 var grayMap = L.tileLayer("https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}", {
     attribution: "© <a href='https://www.mapbox.com/about/maps/'>Mapbox</a> © <a href='http://www.openstreetmap.org/copyright'>OpenStreetMap</a> <strong><a href='https://www.mapbox.com/map-feedback/' target='_blank'>Improve this map</a></strong>",
     tileSize: 512,
@@ -13,43 +33,24 @@ var grayMap = L.tileLayer("https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{
     accessToken: API_KEY
   });
  
-
-  var satellite = L.tileLayer("https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}", {
-    attribution: "© <a href='https://www.mapbox.com/about/maps/'>Mapbox</a> © <a href='http://www.openstreetmap.org/copyright'>OpenStreetMap</a> <strong><a href='https://www.mapbox.com/map-feedback/' target='_blank'>Improve this map</a></strong>",
-    tileSize: 512,
-    maxZoom: 18,
-    zoomOffset: -1,
-    id: "mapbox/satellite-v9",
-    accessToken: API_KEY
-  });
-
-  var outdoors = L.tileLayer("https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}", {
-    attribution: "© <a href='https://www.mapbox.com/about/maps/'>Mapbox</a> © <a href='http://www.openstreetmap.org/copyright'>OpenStreetMap</a> <strong><a href='https://www.mapbox.com/map-feedback/' target='_blank'>Improve this map</a></strong>",
-    tileSize: 512,
-    maxZoom: 18,
-    zoomOffset: -1,
-    id: "mapbox/outdoors-v11",
-    accessToken: API_KEY
-  });
-
 // Create base map layers
-var base_map={
-    GrayMap: grayMap,
-    Satellite: satellite,
-    Outdoors :outdoors
+var base_map = {
+    "Satellite" : satellite,
+    "GrayMap": grayMap,
+    "Outdoors" :outdoors,
 };
-
-//Create map object and geographical reference
-var myMap = L.map("mapid",{
-    center: [40.7, -94.5],
-    zoom: 2,
-    layers: [grayMap, satellite, outdoors]
-});
-grayMap.addTo(myMap);
 
 // Create Earthquake & Tectonic variables
 var earthquakes=new L.LayerGroup();
 var plates=new L.LayerGroup();
+
+//Create map object and geographical reference
+var myMap = L.map("mapid",{
+    center: [38.0, -98.0],
+    zoom: 3,
+    layers: [grayMap, satellite, outdoors]
+});
+grayMap.addTo(myMap);
 
 // Variable Overlays
 var overlays={
@@ -111,3 +112,32 @@ L.geoJson(earthquakeData,{
     }
 }).addTo(myMap);
 
+    // Create Map Legend
+    var legend=L.control({position:"bottomright"});
+    
+    legend.onAdd=function (){
+        var div=L.DomUtil.create("div","info legend");
+        var colorLabels=[0, 1, 2, 3, 4, 5];
+        var colors=["lightgreen","darkgreen","yellow","orange","darkorange","red"];
+        
+        // Loop Through and Generate Labels with Colors
+        for (var i = 0; i < colorLabels.length;i++){
+        div.innerHTML+="<i style='background:"+colors[i]+"'></i>"+colorLabels[i]+
+        (colorLabels[i+1] ? "&ndash;"+colorLabels[i+1]+"<br>":"+");
+    }
+    return div;
+    };
+    legend.addTo(myMap);
+
+    });
+
+// Add Tectonic Plates
+d3.json( "https://raw.githubusercontent.com/fraxen/tectonicplates/master/GeoJSON/PB2002_boundaries.json",
+function(plateData) {
+    L.geoJson(plateData,{
+        color: "yellow",
+        weight: 2.0,
+    })
+    .addTo(plates);
+    plates.addTo(myMap)
+});
