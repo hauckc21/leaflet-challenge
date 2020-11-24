@@ -1,5 +1,3 @@
-console.log("this is logic.js");
-
 const API_KEY = "pk.eyJ1IjoiaGF1Y2tjIiwiYSI6ImNraHV6dGVmazA2dGQzMW1vZGh5d3NybTAifQ.mmDcfDE8B-oYlEjfZFBPgA";
 
 // Define url
@@ -63,7 +61,7 @@ L.control.layers(base_map,overlays).addTo(myMap);
 
 d3.json(url,function(earthquakeData)
 {
-    console.log(earthquakeData.features)
+    console.log(earthquakeData.features);
 
 // define the marker colors as they relate to the earthquake magnitudes
 function Color(magnitude) {
@@ -89,6 +87,27 @@ function markerSize(mag) {
     }
     
     return mag*4;
-    }
+};
 
-});
+function marker (features){
+    return{
+        fillOpacity:1,
+        opacity:1,
+        weight: 0.6,
+        fillColor: Color(features.properties.mag),
+        color: "black",
+        stroke: true,
+        radius: markerSize(features.properties.mag)
+
+    };
+};
+L.geoJson(earthquakeData,{
+    pointToLayer:function(features,latlng){
+        return L.circleMarker(latlng);
+    },
+    style: marker,
+    onEachFeature: function(features, layer){
+        layer.bindPopup("<h4>"+"Magnitude:"+features.properties.mag+"<br>Location:"+features.properties.place+"</h4>");
+    }
+}).addTo(myMap);
+
