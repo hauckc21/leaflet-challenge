@@ -51,10 +51,12 @@ grayMap.addTo(myMap);
 
 // Create Earthquake & Tectonic variables
 var earthquakes=new L.LayerGroup();
+var plates=new L.LayerGroup();
 
 // Variable Overlays
 var overlays={
-    "Earthquakes":earthquakes
+    "Earthquakes":earthquakes,
+    "Tectonic Plates":plates
 };
 // Add a Control to the Map
 L.control.layers(base_map,overlays).addTo(myMap);
@@ -63,3 +65,30 @@ d3.json(url,function(earthquakeData)
 {
     console.log(earthquakeData.features)
 
+// define the marker colors as they relate to the earthquake magnitudes
+function Color(magnitude) {
+    if (magnitude > 5) {
+        return 'red'
+    } else if (magnitude > 4) {
+        return 'darkorange'
+    } else if (magnitude > 3) {
+        return 'orange'
+    } else if (magnitude > 2) {
+        return 'yellow'
+    } else if (magnitude > 1) {
+        return 'darkgreen'
+    } else {
+        return 'lightgreen'
+    }
+};
+
+// Set Marker Size
+function markerSize(mag) {
+    if (mag===0){
+        return 1;
+    }
+    
+    return mag*4;
+    }
+
+});
